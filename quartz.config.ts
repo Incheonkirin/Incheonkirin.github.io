@@ -20,35 +20,37 @@ const config: QuartzConfig = {
     ignorePatterns: ["private", "templates", ".obsidian"],
     defaultDateType: "modified",
     theme: {
+      // Karpathy.github.io 톤 — austere minimal, serif headers,
+      // near-black on white, classic blue links. 한국어는 Pretendard fallback.
       fontOrigin: "googleFonts",
       cdnCaching: true,
       typography: {
-        header: "Schibsted Grotesk",
-        body: "Source Sans Pro",
-        code: "IBM Plex Mono",
+        header: "EB Garamond",
+        body: "Inter",
+        code: "JetBrains Mono",
       },
       colors: {
         lightMode: {
-          light: "#faf8f8",
-          lightgray: "#e5e5e5",
-          gray: "#b8b8b8",
-          darkgray: "#4e4e4e",
-          dark: "#2b2b2b",
-          secondary: "#284b63",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#fff23688",
+          light: "#ffffff",        // pure white
+          lightgray: "#e8e8e8",    // hairline
+          gray: "#888888",         // muted
+          darkgray: "#333333",     // body
+          dark: "#1a1a1a",         // ink
+          secondary: "#0645ad",    // classic blue link (wikipedia style)
+          tertiary: "#0645ad",
+          highlight: "rgba(6, 69, 173, 0.06)",
+          textHighlight: "#fff8a3",
         },
         darkMode: {
-          light: "#161618",
-          lightgray: "#393639",
-          gray: "#646464",
-          darkgray: "#d4d4d4",
-          dark: "#ebebec",
-          secondary: "#7b97aa",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#b3aa0288",
+          light: "#1a1a1a",
+          lightgray: "#2c2c2c",
+          gray: "#888888",
+          darkgray: "#cccccc",
+          dark: "#f0f0f0",
+          secondary: "#79b8ff",    // blue lighter for dark bg
+          tertiary: "#79b8ff",
+          highlight: "rgba(121, 184, 255, 0.10)",
+          textHighlight: "#fff8a355",
         },
       },
     },
