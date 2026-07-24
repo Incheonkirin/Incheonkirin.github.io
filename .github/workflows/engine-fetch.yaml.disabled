@@ -1,0 +1,52 @@
+# 자동화 워크플로 — 본인 검수 후 .disabled 떼고 활성화 (Publish After Approval).
+#
+# 매일 21:30 KST (12:30 UTC) 에 fetch + render + auto-commit.
+# Quartz 빌드/배포는 별도 워크플로(deploy-pages.yaml)가 push 트리거로 잡는다.
+
+name: engine-fetch
+
+on:
+  schedule:
+    - cron: "30 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: engine/requirements.txt
+
+      - name: Install deps
+        run: python -m pip install -r engine/requirements.txt
+
+      - name: Install Chromium for Playwright
+        run: python -m playwright install --with-deps chromium
+
+      - name: Fetch sources
+        working-directory: engine
+        run: python fetch.py
+
+      - name: Render pulse
+        working-directory: engine
+        run: python render.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "engine-bot"
+          git config user.email "engine-bot@users.noreply.github.com"
+          git add engine/state content/pulse
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "engine: daily fetch $(date -u +%Y-%m-%d)"
+            git push
+          fi

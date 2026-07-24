@@ -1,0 +1,310 @@
+@use "./base.scss";
+@use "./variables.scss" as *;
+
+// toss.tech-style: top bar, single centered reading column (+ TOC on desktop),
+// Pretendard, 17px/1.7 body, generous section spacing, rounded surfaces.
+
+// ---------------------------------------------------------------------------
+// Layout: turn the left sidebar into a sticky top bar on every breakpoint.
+// ---------------------------------------------------------------------------
+.page {
+  max-width: 1080px;
+
+  & > #quartz-body {
+    grid-template-columns: auto #{$sidePanelWidth};
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "grid-sidebar-left grid-sidebar-left"
+      "grid-header grid-sidebar-right"
+      "grid-center grid-sidebar-right"
+      "grid-footer grid-sidebar-right";
+
+    @media all and ($tablet) {
+      grid-template-columns: auto;
+      grid-template-rows: auto auto auto auto auto;
+      grid-template-areas:
+        "grid-sidebar-left"
+        "grid-header"
+        "grid-center"
+        "grid-sidebar-right"
+        "grid-footer";
+    }
+
+    & .sidebar.left {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: auto;
+      flex-direction: row;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1.05rem 0 0.95rem 0;
+      margin-bottom: 1.25rem;
+      background-color: var(--light);
+      border-bottom: 1px solid var(--lightgray);
+    }
+
+    & .sidebar.right {
+      padding: 2rem 0 2rem 1.25rem;
+      @media all and not ($desktop) {
+        display: none;
+      }
+    }
+
+    & .page-header {
+      margin: 1.25rem 0 0 0;
+    }
+
+    // reading column: cap and center like toss.tech
+    & .page-header,
+    & .center > article,
+    & footer {
+      max-width: 46rem;
+      width: 100%;
+      min-width: auto;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+  }
+}
+
+// index/about have no TOC: collapse to a single centered column
+body[data-slug="index"],
+body[data-slug="about"] {
+  .page > #quartz-body {
+    grid-template-columns: auto;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "grid-sidebar-left"
+      "grid-header"
+      "grid-center"
+      "grid-footer";
+
+    & .sidebar.right {
+      display: none;
+    }
+  }
+}
+
+.page-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  font-family: "Pretendard Variable", var(--bodyFont);
+
+  a {
+    color: var(--dark);
+  }
+}
+
+.site-nav {
+  margin-left: auto;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 1.4rem !important;
+  font-size: 0.92rem;
+
+  a,
+  a.internal {
+    color: var(--darkgray);
+    font-weight: 500;
+
+    &:hover {
+      color: var(--secondary);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Typography
+// ---------------------------------------------------------------------------
+body {
+  font-family: "Pretendard Variable", var(--bodyFont);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+thead,
+.article-title,
+.page-title {
+  font-family: "Pretendard Variable", var(--headerFont);
+}
+
+.page article {
+  font-size: 1.0625rem; // 17px
+  line-height: 1.72;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  color: var(--darkgray);
+
+  & > h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 3rem;
+  }
+
+  h3 {
+    font-size: 1.13rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin-top: 2.25rem;
+  }
+
+  p {
+    margin: 1.35rem 0 0.4rem 0;
+  }
+
+  a {
+    font-weight: 500;
+
+    &.internal {
+      background-color: transparent;
+      padding: 0;
+    }
+
+    &:hover {
+      color: var(--tertiary);
+    }
+  }
+
+  blockquote {
+    border-left: none;
+    border-radius: 12px;
+    background-color: color-mix(in srgb, var(--lightgray) 32%, var(--light));
+    padding: 1.05rem 1.3rem;
+    margin: 1.6rem 0;
+
+    p {
+      margin: 0.4rem 0;
+    }
+  }
+
+  code {
+    font-size: 0.83em;
+    border-radius: 6px;
+    padding: 0.16em 0.42em;
+    background-color: color-mix(in srgb, var(--lightgray) 45%, var(--light));
+  }
+
+  pre {
+    border: none;
+    border-radius: 12px;
+    background-color: color-mix(in srgb, var(--lightgray) 26%, var(--light));
+    padding: 1.2rem 1.35rem;
+
+    & > code {
+      background-color: transparent;
+      font-size: 0.86rem;
+      line-height: 1.65;
+      padding: 0;
+    }
+  }
+
+  img {
+    border-radius: 14px;
+  }
+
+  hr {
+    height: 1px;
+    background-color: var(--lightgray);
+    border: none;
+  }
+
+  table {
+    font-size: 0.95rem;
+  }
+}
+
+.content-meta {
+  font-size: 0.88rem;
+  margin-top: 0.5rem;
+}
+
+.toc {
+  font-size: 0.85rem;
+}
+
+footer {
+  font-size: 0.85rem;
+  color: var(--gray);
+  margin-top: 3rem;
+}
+
+// ---------------------------------------------------------------------------
+// Landing: toss.tech article-list rows (title / one-line subtitle / meta).
+// ---------------------------------------------------------------------------
+body[data-slug="index"] {
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  article > p:first-of-type {
+    max-width: 44rem;
+    font-size: 1.1rem;
+    line-height: 1.75;
+  }
+
+  article > h2 {
+    margin-top: 3.4rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--lightgray);
+    font-size: 1.05rem;
+    color: var(--gray);
+    font-weight: 600;
+  }
+
+  article > h3 {
+    margin-top: 2.4rem;
+    margin-bottom: 0;
+    font-size: 1.28rem;
+    line-height: 1.45;
+
+    a,
+    a.internal {
+      color: var(--dark);
+
+      &:hover {
+        color: var(--secondary);
+      }
+    }
+  }
+
+  article > h3 + p {
+    margin-top: 0.45rem;
+    margin-bottom: 0.3rem;
+    color: color-mix(in srgb, var(--darkgray) 78%, var(--gray));
+  }
+
+  article > p > em {
+    color: var(--gray);
+    font-style: normal;
+    font-size: 0.85rem;
+  }
+}
+
+body[data-slug="about"] article {
+  & > p:first-of-type {
+    font-size: 1.1rem;
+    line-height: 1.75;
+  }
+
+  & > h2 {
+    margin-top: 2.75rem;
+  }
+}

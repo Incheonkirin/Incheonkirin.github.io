@@ -1,0 +1,100 @@
+{
+  "id": "kbfg",
+  "last_fetch": "2026-05-18T09:33:48+00:00",
+  "last_status": [
+    "https://www.kbfg.com/kbresearch/report/reportList.do → 200 (27833 bytes)"
+  ],
+  "items": [
+    {
+      "title": "연구보고서",
+      "url": "https://www.kbfg.com/kbresearch/report/reportList.do",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "KB브랜드보고서",
+      "url": "https://www.kbfg.com/kbresearch/brand/brandList.do",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "KB지식비타민",
+      "url": "https://www.kbfg.com/kbresearch/vitamin/reportList.do",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "동영상 보고서",
+      "url": "https://www.kbfg.com/kbresearch/vitamin/mediaList.do",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "연구소 소개",
+      "url": "https://www.kbfg.com/kbresearch/about/organization.do",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "공지 및 보도자료",
+      "url": "https://www.kbfg.com/kbresearch/notice/noticeList.do",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "채용정보",
+      "url": "https://www.kbfg.com/kbresearch/recruit/recruitList.do",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "오시는 길",
+      "url": "https://www.kbfg.com/kbresearch/about/location.do",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "고객/디지털[KB지식비타민] 설명은 됐고, 나 대신 해줘 DIFM(Do It For Me)경제강윤정2026-05-18조회수82",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000568",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "부동산KB주택시장리뷰-2026년 5월호부동산연구팀2026-05-18조회수28",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000494",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "고객/디지털[KB지식비타민] AI를 바라보는 두 가지 시선-오픈AI와 앤스로픽 이야기문지은2026-05-04조회수1571",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000567",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "거시/경제[KB지식비타민] 낭비는 줄이고, 가치는 키우는 순환경제김지훈2026-04-20조회수1845",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000566",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "고객/디지털[KB지식비타민] AI는 모르는 인간의 마음양혜정2026-04-16조회수2454",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000565",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "부동산KB주택시장리뷰-2026년 4월호부동산연구팀2026-04-14조회수4481",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000564",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "고객/디지털[KB지식비타민] 인공지능(AI)은 소프트웨어 기업의 비즈니스 모델 붕괴를 불러올까박교순2026-03-23조회수3803",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000563",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "부동산KB주택시장리뷰-2026년 3월호부동산연구팀2026-03-13조회수6411",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000562",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "산업일반[KB지식비타민] MADE IN SPACE, 지구 한계를 뛰어넘는 우주 공장장경석2026-03-09조회수2452",
+      "url": "https://www.kbfg.com/kbresearch/report/reportView.do?reportId=2000561",
+      "first_seen": "2026-05-18"
+    },
+    {
+      "title": "저작권 정책",
+      "url": "https://www.kbfg.com/kbresearch/about/policy.do",
+      "first_seen": "2026-05-18"
+    }
+  ],
+  "new_count_this_run": 18
+}

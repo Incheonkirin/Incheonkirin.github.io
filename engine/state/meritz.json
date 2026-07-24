@@ -1,0 +1,15 @@
+{
+  "id": "meritz",
+  "last_fetch": "2026-05-18T09:33:52+00:00",
+  "last_status": [
+    "https://www.meritzfire.com/customer-center/notice.do → 200 (42690 bytes)"
+  ],
+  "items": [
+    {
+      "title": "공지사항",
+      "url": "https://www.meritzfire.com/footer/notice.do",
+      "first_seen": "2026-05-18"
+    }
+  ],
+  "new_count_this_run": 1
+}

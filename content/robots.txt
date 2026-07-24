@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://incheonkirin.github.io/sitemap.xml

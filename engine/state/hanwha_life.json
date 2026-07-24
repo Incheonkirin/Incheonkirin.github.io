@@ -1,0 +1,9 @@
+{
+  "id": "hanwha_life",
+  "last_fetch": "2026-05-18T09:33:50+00:00",
+  "last_status": [
+    "https://www.hanwhalife.com/static/company/news/CO_NW_LB_CD000_P10000.jsp → ERROR: HTTPSConnectionPool(host='www.hanwhalife.com', port=443): Max retries exceeded with url: /static/company/news/CO_NW_LB_CD000_P10000.jsp (Caused by SSLError(SSLError(1, '[SSL: UNSAFE_LEGACY_RENEGOTIATION_DISABLED] unsafe legacy renegotiation disabled (_ssl.c:1028)')))"
+  ],
+  "items": [],
+  "new_count_this_run": 0
+}

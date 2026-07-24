@@ -1,0 +1,10 @@
+{
+  "id": "kp_insurance",
+  "last_fetch": "2026-05-18T09:33:51+00:00",
+  "last_status": [
+    "https://www.kakaopayinsurance.com/notice → ERROR: HTTPSConnectionPool(host='www.kakaopayinsurance.com', port=443): Max retries exceeded with url: /notice (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1063ac050>: Failed to resolve 'www.kakaopayinsurance.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+    "https://www.kakaopayinsurance.com/insurance → ERROR: HTTPSConnectionPool(host='www.kakaopayinsurance.com', port=443): Max retries exceeded with url: /insurance (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x106568050>: Failed to resolve 'www.kakaopayinsurance.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  ],
+  "items": [],
+  "new_count_this_run": 0
+}
