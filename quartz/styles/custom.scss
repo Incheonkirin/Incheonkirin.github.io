@@ -247,54 +247,170 @@ footer {
 }
 
 // ---------------------------------------------------------------------------
-// Landing: toss.tech article-list rows (title / one-line subtitle / meta).
+// Landing: evidence grouped by problem area. One lead case per area (fuller,
+// darker) followed by shorter entries. Separation comes from whitespace rhythm
+// and ink weight — no rules, no cards, no buttons.
 // ---------------------------------------------------------------------------
 body[data-slug="index"] {
   .page-header {
-    margin-bottom: 2rem;
+    margin: 0;
   }
 
-  article > p:first-of-type {
-    max-width: 44rem;
-    font-size: 1.1rem;
-    line-height: 1.75;
+  .intro {
+    padding: 1rem 0 0.5rem;
   }
 
-  article > h2 {
-    margin-top: 3.4rem;
-    padding-top: 1.4rem;
-    border-top: 1px solid var(--lightgray);
-    font-size: 1.05rem;
-    color: var(--gray);
+  .lede {
+    margin: 0;
+    max-width: 33em;
+    font-size: 1.375rem;
     font-weight: 600;
+    line-height: 1.62;
+    letter-spacing: -0.021em;
+    color: var(--dark);
   }
 
-  article > h3 {
-    margin-top: 2.4rem;
-    margin-bottom: 0;
-    font-size: 1.28rem;
-    line-height: 1.45;
+  .creds {
+    margin: 1.15rem 0 0;
+    max-width: 38em;
+    font-size: 0.9375rem;
+    line-height: 1.68;
+    color: var(--gray);
+  }
+
+  .section {
+    padding-top: 4.75rem;
+  }
+
+  .section-head {
+    margin-bottom: 2.1rem;
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--dark);
+  }
+
+  .section-frame {
+    margin: 0.6rem 0 0;
+    max-width: 36em;
+    font-size: 0.9375rem;
+    line-height: 1.68;
+    color: var(--gray);
+  }
+
+  // lead case: the flagship of that area
+  .lead-entry {
+    margin-bottom: 2.75rem;
+  }
+
+  .lead-title {
+    margin: 0;
+    max-width: 23em;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.44;
+    letter-spacing: -0.025em;
 
     a,
     a.internal {
       color: var(--dark);
 
       &:hover {
-        color: var(--secondary);
+        color: var(--tertiary);
       }
     }
   }
 
-  article > h3 + p {
-    margin-top: 0.45rem;
-    margin-bottom: 0.3rem;
-    color: color-mix(in srgb, var(--darkgray) 78%, var(--gray));
+  .lead-body {
+    margin: 0.9rem 0 0;
+    max-width: 35em;
+    color: var(--darkgray);
   }
 
-  article > p > em {
+  .lead-result {
+    margin: 0.75rem 0 0;
+    max-width: 36em;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.66;
+    color: var(--darkgray);
+
+    .dim {
+      color: var(--gray);
+      font-weight: 400;
+    }
+  }
+
+  // supporting entries: one step lighter and smaller
+  .entry {
+    margin-bottom: 1.4rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .entry-title {
+    margin: 0;
+    max-width: 27em;
+    font-size: 1.0625rem;
+    font-weight: 650;
+    line-height: 1.42;
+    letter-spacing: -0.017em;
+
+    a,
+    a.internal {
+      color: var(--darkgray);
+
+      &:hover {
+        color: var(--tertiary);
+      }
+    }
+  }
+
+  .entry-body {
+    margin: 0.15rem 0 0;
+    max-width: 38em;
+    font-size: 0.9375rem;
+    line-height: 1.6;
     color: var(--gray);
-    font-style: normal;
-    font-size: 0.85rem;
+  }
+
+  .meta {
+    margin: 0.3rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--gray);
+    opacity: 0.72;
+  }
+
+  @media all and (max-width: 800px) {
+    .lede {
+      font-size: 1.1875rem;
+    }
+
+    .section {
+      padding-top: 3.9rem;
+    }
+
+    .section-head {
+      margin-bottom: 1.75rem;
+    }
+
+    .lead-entry {
+      margin-bottom: 2.25rem;
+    }
+
+    .lead-title {
+      font-size: 1.3125rem;
+    }
+
+    .entry-title {
+      font-size: 1rem;
+    }
   }
 }
 

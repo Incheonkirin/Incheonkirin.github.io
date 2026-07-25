@@ -1,78 +1,92 @@
 ---
 title: Mingi Jeong
-description: "Failure reports from Korean search and ML serving: bugs reproduced, traced to their source, and fixed."
+description: "Failures in Korean search, ranking, and ML systems traced to reproducible tests, then to an upstream fix or a measured decision."
 ---
 
-A query for 비급여 (non-covered) returns clauses about 급여 (covered). A sentence copied verbatim from a document returns zero hits. Korean's agglutinative structure exposes failures across the search and serving stack—failures that aggregate metrics can miss. This blog documents how they were reproduced, traced, and fixed.
+<section class="intro">
+  <p class="lede">I trace failures in Korean search, ranking, and ML systems to reproducible tests — then to an upstream fix or a measured decision.</p>
+  <p class="creds">5.5 years in Korean search &amp; QA at 42Maru · production ML at MetLife · 18 patches merged into Lucene, Elasticsearch, sentence-transformers, and Transformers.</p>
+</section>
 
-## Writing
+<section class="section">
+  <div class="section-head">
+    <h2 class="section-title">Search correctness</h2>
+    <p class="section-frame">Where a transformation that is correct on its own — a normalizer, a decompounder, a dictionary — still makes the search return the wrong thing.</p>
+  </div>
 
-### [Verbatim search returns zero hits: position holes in Elasticsearch nori](posts/2026-07-15-elasticsearch-nori-position-hole)
+  <article class="lead-entry">
+    <h3 class="lead-title"><a class="internal" href="posts/2026-06-30-nfd-hangul-and-noris-dictionary">Two Korean strings look identical but don't match</a></h3>
+    <p class="lead-body">Korean text typed on a Mac can look the same on screen yet be stored as different bytes (NFD form). The search engine's dictionary only knew the other form, so that text was quietly dropped and never matched. I added a filter that composes the characters into the dictionary's form before indexing — no extra dependency, and search highlighting still lines up.</p>
+    <p class="lead-result">Merged into Apache Lucene <span class="dim">· reviewed and approved by a Lucene core maintainer (Robert Muir) · #16242</span></p>
+  </article>
 
-With nori's mixed decompounding and a POS filter enabled, a `match_phrase` for the original text returned zero hits. I fixed the two paths where token-graph position holes were lost in span queries and added regression tests.
+  <div class="entries">
+    <article class="entry">
+      <h3 class="entry-title"><a class="internal" href="posts/2026-07-15-elasticsearch-nori-position-hole">The exact sentence from a document returned zero hits</a></h3>
+      <p class="entry-body">A verbatim <code>match_phrase</code> found nothing because two query paths were dropping a positional gap the Korean analyzer had created.</p>
+      <p class="meta">Elasticsearch · Nori · 2026.07 · merged (#152931)</p>
+    </article>
+    <article class="entry">
+      <h3 class="entry-title"><a class="internal" href="posts/2026-06-16-noris-default-stoptags-drop-korean-negation-prefixes">Searching 비급여 (non-covered) returned 급여 (covered)</a></h3>
+      <p class="entry-body">The default Korean analyzer removes negation prefixes, merging opposite words at index time.</p>
+      <p class="meta">Elasticsearch · Nori · 2026.06 · merged (#151157)</p>
+    </article>
+    <article class="entry">
+      <h3 class="entry-title"><a class="internal" href="posts/2026-07-20-wildcard-operators-from-a-normalizer">A normalizer turned fullwidth characters into wildcard operators</a></h3>
+      <p class="entry-body">A <code>keyword</code> normalizer folded fullwidth forms to ASCII <em>after</em> wildcard escaping, so characters that were meant as literals became query operators.</p>
+      <p class="meta">Elasticsearch · Wildcard · 2026.07 · merged (#153582)</p>
+    </article>
+  </div>
+</section>
 
-_Elasticsearch · Nori · Retrieval · 2026.07_
+<section class="section">
+  <div class="section-head">
+    <h2 class="section-title">Ranking &amp; retrieval</h2>
+    <p class="section-frame">Learning-to-rank losses and retrieval quality — from a gradient that was quietly wrong to a number a maintainer could measure.</p>
+  </div>
 
+  <article class="lead-entry">
+    <h3 class="lead-title"><a class="internal" href="posts/2026-06-20-padding-in-the-plackett-luce-normalizer-listmle">A ranking model trained differently depending on the batch</a></h3>
+    <p class="lead-body">To train a ranking model quickly, many search queries are scored together in one batch — but each query has a different number of documents, so the shorter lists are filled with empty placeholder slots to make them the same length. Those empty slots were being counted as if they were real documents, so the same query trained differently depending on which other queries happened to share its batch. I excluded the padding from the calculation so the result no longer depends on batch composition.</p>
+    <p class="lead-result">Merged. The maintainer re-ran their retrieval benchmark and measured a large ranking-quality gain <span class="dim">— NanoBEIR nDCG@10 0.39 → 0.53 · #3827</span></p>
+  </article>
 
-### [An FDS dataset solvable with 48 transaction amounts: auditing 6.38M AI-Hub records](posts/2026-07-15-aihub-fds-dataset-validity)
+  <div class="entries">
+    <article class="entry">
+      <h3 class="entry-title"><a class="internal" href="posts/2026-06-18-three-fixes-in-sentence-transformers-v56">Two correctness fixes and a scalability fix in v5.6.0</a></h3>
+      <p class="entry-body">A full similarity-matrix materialization, a missing rank offset in multi-GPU masking, and a sign-dependent relative margin — merged in one release.</p>
+      <p class="meta">sentence-transformers · Mining · GIST · 2026.06 · merged (#3816–3821)</p>
+    </article>
+  </div>
+</section>
 
-I audited 6.38 million records of AI-Hub's financial anomaly dataset. 4.43M interbank-network rows contained only 48 distinct transaction amounts, and the bracket covering 98.97% of the data had zero positives.
+<section class="section">
+  <div class="section-head">
+    <h2 class="section-title">ML systems &amp; evaluation</h2>
+    <p class="section-frame">Serving state, dataset validity, and label policy — where the right call is a reproducible test or a measured decision, not a bigger model.</p>
+  </div>
 
-_Fraud Detection · Data Validation · 2026.07_
+  <article class="lead-entry">
+    <h3 class="lead-title"><a class="internal" href="posts/2026-07-15-aihub-fds-dataset-validity">A fraud dataset that 48 numbers could solve</a></h3>
+    <p class="lead-body">A public AI-Hub dataset is used as training data for financial fraud detection. Auditing 6.38 million records, I found that 4.43M interbank-network rows held only 48 distinct transaction amounts, and the amount bracket covering 98.97% of the data contained no fraud at all — so a model can score well on it without learning anything about fraud. The audit is published with reproducible code.</p>
+    <p class="lead-result">Data validity measured before model comparison <span class="dim">· 6.38M records · public reproducible audit</span></p>
+  </article>
 
-
-### [Snapshotting generation output in Transformers continuous batching](posts/2026-07-14-snapshotting-generation-output-in-transformers-continuous-batching)
-
-Already-streamed chunks changed retroactively, and soft-reset requests stopped before `max_new_tokens`. I replaced the per-token output transform with a snapshot.
-
-_Transformers · Serving · 2026.07_
-
-
-### [When a normalizer turns fullwidth characters into wildcard operators](posts/2026-07-20-wildcard-operators-from-a-normalizer)
-
-A `keyword` field with a normalizer that folds fullwidth forms to ASCII made `wildcard` queries over-match or return zero hits, because normalized operators were not re-escaped. Fixed and backported to four release lines.
-
-_Elasticsearch · Wildcard · CJK · 2026.07_
-
-### [NFD Hangul does not match nori's dictionary: a composition char filter for Lucene](posts/2026-06-30-nfd-hangul-and-noris-dictionary)
-
-Korean text in NFD form fails nori's dictionary lookup and falls back to UNKNOWN tokens, so NFC queries miss NFD-indexed text. Lucene #16242 adds an opt-in char filter that composes conjoining jamo before tokenization.
-
-_Lucene · Nori · Unicode · 2026.06_
-
-
-### [Padding was inflating the Plackett-Luce normalizer in ListMLE](posts/2026-06-20-padding-in-the-plackett-luce-normalizer-listmle)
-
-Padded slots contributed unit mass to every real document's normalizer, so loss and gradients depended on batch composition. The maintainer benchmarked both affected losses on NanoBEIR after the fix.
-
-_sentence-transformers · Ranking loss · 2026.06_
-
-
-### [Two correctness fixes and a scalability fix in sentence-transformers v5.6.0](posts/2026-06-18-three-fixes-in-sentence-transformers-v56)
-
-A full similarity-matrix materialization, a missing rank offset in multi-GPU positive masking, and a sign-dependent relative margin, all merged in one release.
-
-_sentence-transformers · Mining · GIST · 2026.06_
-
-
-
-### [Searching 비급여 returns 급여: nori's default stoptags drop Korean negation prefixes](posts/2026-06-16-noris-default-stoptags-drop-korean-negation-prefixes)
-
-Elasticsearch's default Korean analyzer removes the XPN tag, deleting negation prefixes and merging antonyms at index time. The behavior is now documented upstream.
-
-_Elasticsearch · Nori · Korean · 2026.06_
-
-
-### [Managing unreviewed cases as a third label](posts/2026-02-17-when-negative-labels-cant-be-trusted-pu-learning)
-
-Labeling cases that are merely awaiting review as negatives turns past investigation policy into the model's ground truth. I split "unreviewed" into its own label and measured the selection bias.
-
-_Label Quality · PU Learning · 2026.02_
-
-
-### [Choosing a model when positives are 0.5%](posts/2026-02-16-choosing-a-model-at-0.5-percent-positives)
-
-The investigation team can process 100 cases a day. This post turns model metrics into an actual investigation policy under that capacity.
-
-_Model Evaluation · Precision@K · 2026.02_
-
+  <div class="entries">
+    <article class="entry">
+      <h3 class="entry-title"><a class="internal" href="posts/2026-02-17-when-negative-labels-cant-be-trusted-pu-learning">Treating unreviewed cases as a third label</a></h3>
+      <p class="entry-body">Labeling cases that are merely awaiting review as negatives turns past investigation policy into the model's ground truth, so I split "unreviewed" into its own label and measured the selection bias.</p>
+      <p class="meta">Label Quality · PU Learning · 2026.02</p>
+    </article>
+    <article class="entry">
+      <h3 class="entry-title"><a class="internal" href="posts/2026-02-16-choosing-a-model-at-0.5-percent-positives">Choosing a model when only 0.5% of cases are positive</a></h3>
+      <p class="entry-body">The investigation team can process about 100 cases a day, which turns abstract model metrics into an actual investigation policy under that capacity limit.</p>
+      <p class="meta">Model Evaluation · Precision@K · 2026.02</p>
+    </article>
+    <article class="entry">
+      <h3 class="entry-title"><a class="internal" href="posts/2026-07-14-snapshotting-generation-output-in-transformers-continuous-batching">Streaming text changed after it had already been sent</a></h3>
+      <p class="entry-body">In batched generation, chunks already streamed to the user could change retroactively because the output read from live shared buffers.</p>
+      <p class="meta">Transformers · Serving · 2026.07 · merged (#46670)</p>
+    </article>
+  </div>
+</section>
