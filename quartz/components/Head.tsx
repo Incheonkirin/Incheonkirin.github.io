@@ -27,8 +27,8 @@ export default (() => {
     const baseDir = fileData.slug === "404" ? path : pathToRoot(fileData.slug!)
     // Use distinct filenames and native tab sizes so browsers cannot reuse a
     // favicon bitmap cached under the previous URL.
-    const icon16Path = joinSegments(baseDir, "static/favicon-kirin-16.png")
-    const icon32Path = joinSegments(baseDir, "static/favicon-kirin-32.png")
+    const icon16Path = joinSegments(baseDir, "static/favicon-kirin-clean-16.png")
+    const icon32Path = joinSegments(baseDir, "static/favicon-kirin-clean-32.png")
     const darkIconPath = joinSegments(baseDir, "static/favicon-kirin-dark.svg")
     const touchIconPath = joinSegments(baseDir, "static/icon-new.png")
 
