@@ -25,7 +25,9 @@ export default (() => {
     const url = new URL(`https://${cfg.baseUrl ?? "example.com"}`)
     const path = url.pathname as FullSlug
     const baseDir = fileData.slug === "404" ? path : pathToRoot(fileData.slug!)
-    const iconPath = joinSegments(baseDir, "static/icon.png")
+    // Browsers cache favicons by URL, so a changed icon at the same path keeps
+    // serving the old one. Bump this when the icon changes.
+    const iconPath = joinSegments(baseDir, "static/icon.png") + "?v=2"
 
     // Canonical URL of the current page. GitHub Pages also serves index.html at `/index`,
     // so the homepage must consistently identify `/` as the canonical location.
