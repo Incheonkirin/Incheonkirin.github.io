@@ -29,8 +29,36 @@ export default (() => {
     // favicon bitmap cached under the previous URL.
     const icon16Path = joinSegments(baseDir, "static/favicon-kirin-clean-16.png")
     const icon32Path = joinSegments(baseDir, "static/favicon-kirin-clean-32.png")
-    const darkIconPath = joinSegments(baseDir, "static/favicon-kirin-dark.svg")
+    const darkIconPath = joinSegments(baseDir, "static/favicon-kirin-chrome-dark.svg")
     const touchIconPath = joinSegments(baseDir, "static/icon-new.png")
+    const chromiumDarkIconScript = `
+      (() => {
+        const isChrome =
+          /(?:Chrome|Chromium)\\//.test(navigator.userAgent) &&
+          !/(?:Edg|OPR)\\//.test(navigator.userAgent)
+        if (!isChrome) return
+
+        const darkMode = window.matchMedia("(prefers-color-scheme: dark)")
+        const updateIcon = () => {
+          const existing = document.querySelector('link[data-chromium-dark-favicon]')
+          if (!darkMode.matches) {
+            existing?.remove()
+            return
+          }
+
+          const icon = existing ?? document.createElement("link")
+          icon.rel = "icon"
+          icon.type = "image/svg+xml"
+          icon.setAttribute("sizes", "any")
+          icon.setAttribute("data-chromium-dark-favicon", "")
+          icon.href = ${JSON.stringify(darkIconPath)}
+          if (!existing) document.head.append(icon)
+        }
+
+        updateIcon()
+        darkMode.addEventListener("change", updateIcon)
+      })()
+    `
 
     // Canonical URL of the current page. GitHub Pages also serves index.html at `/index`,
     // so the homepage must consistently identify `/` as the canonical location.
@@ -101,14 +129,8 @@ export default (() => {
 
         <link rel="icon" href={icon32Path} type="image/png" sizes="32x32" />
         <link rel="icon" href={icon16Path} type="image/png" sizes="16x16" />
-        <link
-          rel="icon"
-          href={darkIconPath}
-          type="image/svg+xml"
-          sizes="any"
-          media="(prefers-color-scheme: dark)"
-        />
         <link rel="apple-touch-icon" href={touchIconPath} type="image/png" sizes="200x200" />
+        <script dangerouslySetInnerHTML={{ __html: chromiumDarkIconScript }} />
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
         <link rel="canonical" href={canonicalUrl} />
