@@ -27,8 +27,8 @@ export default (() => {
     const baseDir = fileData.slug === "404" ? path : pathToRoot(fileData.slug!)
     // Use distinct filenames and native tab sizes so browsers cannot reuse a
     // favicon bitmap cached under the previous URL.
-    const icon16Path = joinSegments(baseDir, "static/favicon-kirin-16.png")
-    const icon32Path = joinSegments(baseDir, "static/favicon-kirin-32.png")
+    const icon16Path = joinSegments(baseDir, "static/favicon-kirin-contrast-16.png")
+    const icon32Path = joinSegments(baseDir, "static/favicon-kirin-contrast-32.png")
     const touchIconPath = joinSegments(baseDir, "static/icon-new.png")
 
     // Canonical URL of the current page. GitHub Pages also serves index.html at `/index`,
