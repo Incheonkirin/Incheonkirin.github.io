@@ -25,9 +25,11 @@ export default (() => {
     const url = new URL(`https://${cfg.baseUrl ?? "example.com"}`)
     const path = url.pathname as FullSlug
     const baseDir = fileData.slug === "404" ? path : pathToRoot(fileData.slug!)
-    // Use a distinct filename when the icon changes so browsers cannot reuse
-    // a favicon bitmap cached under the previous URL.
-    const iconPath = joinSegments(baseDir, "static/icon-new.png")
+    // Use distinct filenames and native tab sizes so browsers cannot reuse a
+    // favicon bitmap cached under the previous URL.
+    const icon16Path = joinSegments(baseDir, "static/favicon-kirin-16.png")
+    const icon32Path = joinSegments(baseDir, "static/favicon-kirin-32.png")
+    const touchIconPath = joinSegments(baseDir, "static/icon-new.png")
 
     // Canonical URL of the current page. GitHub Pages also serves index.html at `/index`,
     // so the homepage must consistently identify `/` as the canonical location.
@@ -96,7 +98,9 @@ export default (() => {
           </>
         )}
 
-        <link rel="icon" href={iconPath} type="image/png" sizes="200x200" />
+        <link rel="icon" href={icon32Path} type="image/png" sizes="32x32" />
+        <link rel="icon" href={icon16Path} type="image/png" sizes="16x16" />
+        <link rel="apple-touch-icon" href={touchIconPath} type="image/png" sizes="200x200" />
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
         <link rel="canonical" href={canonicalUrl} />
