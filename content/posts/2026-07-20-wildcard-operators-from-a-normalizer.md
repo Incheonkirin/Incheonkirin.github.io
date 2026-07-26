@@ -6,6 +6,31 @@ description: "A keyword field with a normalizer that folds fullwidth forms to AS
 
 A `wildcard` query for the literal string `foo＊bar` (with a fullwidth asterisk, U+FF0A) on a `keyword` field returned documents it should not have. Escaping the character, `foo\＊bar`, returned zero hits instead of the one exact match. The field used a normalizer that folds fullwidth forms to ASCII, and the operators `*` `?` `\` were the trigger.
 
+## Reproduction matrix
+
+The merged regression indexes four values through a normalizer that maps fullwidth wildcard forms to ASCII:
+
+```text
+document 1: foo＊bar  → indexed term foo*bar
+document 2: foo？bar  → indexed term foo?bar
+document 3: foo＼bar  → indexed term foo\bar
+document 4: foobar   → indexed term foobar
+```
+
+These assertions pin the distinction between literal fullwidth data and real ASCII operators:
+
+| Query pattern | Meaning after the fix | Hits |
+|---|---|---:|
+| `foo＊bar` | literal `*` | 1 |
+| `foo\＊bar` | the same literal `*` | 1 |
+| `foo？bar` | literal `?` | 1 |
+| `foo＼bar` | literal `\` | 1 |
+| `foo*bar` | zero-or-more wildcard | 4 |
+| `foo?bar` | one-character wildcard | 3 |
+| `foo\\bar` | literal ASCII backslash | 1 |
+
+Before the fix, a bare fullwidth literal could become an operator after normalization, while an escaped fullwidth literal skipped the normalization needed to match the indexed term. The two spellings therefore produced over-matching and zero hits respectively.
+
 ## Mechanism
 
 On a `keyword` field, a `wildcard` query runs its pattern through the field's normalizer so the pattern matches normalized index terms. The catch is that `*`, `?`, and `\` are wildcard control characters, so `normalizeWildcardPattern` normalizes only the literal parts and keeps the operators as operators. When the normalizer itself emits one of those three characters, that separation breaks. Two distinct defects:
@@ -30,3 +55,5 @@ The regression test indexes documents whose source contains the fullwidth `＊`,
 ## Takeaway
 
 This is the same shape as the other Korean-search failures in this series: a transformation that is correct in isolation (the normalizer folds fullwidth to ASCII, exactly as configured) emits a character that a later stage reads as a control operator rather than data. The fix keeps normalizing and re-escapes at the boundary, so data stays data. If you run `wildcard` queries against `keyword` fields with a non-trivial normalizer, check what that normalizer does to `*`, `?`, and `\`.
+
+For the related Unicode, morphology, and token-graph failures, start with the [Korean search correctness guide](../ko/korean-search-correctness).

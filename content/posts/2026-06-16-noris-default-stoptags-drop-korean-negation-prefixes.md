@@ -2,6 +2,10 @@
 title: "Searching 비급여 returns 급여: nori's default stoptags drop Korean negation prefixes"
 date: 2026-06-16
 description: "Elasticsearch's default Korean analyzer removes the XPN part-of-speech tag, which deletes negation prefixes like 비/무/미 and merges antonyms at index time. Documented upstream in Elasticsearch #151157."
+lang: en
+translations:
+  en: posts/2026-06-16-noris-default-stoptags-drop-korean-negation-prefixes
+  ko: ko/posts/elasticsearch-nori-xpn-stoptags
 ---
 
 While building a search system over insurance policy documents, I noticed that searching 비급여 (non-covered) returned 급여 (covered) clauses, and the other way around. Two words with opposite meanings had become the same word inside the engine.
@@ -15,6 +19,22 @@ GET _analyze
 {
   "analyzer": "nori",
   "text": "비급여"
+}
+```
+
+The response makes the information loss visible:
+
+```json
+{
+  "tokens": [
+    {
+      "token": "급여",
+      "start_offset": 1,
+      "end_offset": 3,
+      "type": "word",
+      "position": 1
+    }
+  ]
 }
 ```
 
@@ -43,3 +63,5 @@ The operational prescription is short. In domains where meaning inversion matter
 Getting from the symptom (wrong coverage results) to the root cause (one default tag) required nothing more than `_analyze`. A large share of Korean search quality problems originate in the analyzer layer before ranking is involved, and English-language test suites do not exercise this class of failure.
 
 A second failure in the same corpus, a `match_phrase` for a string copied verbatim from a document returning zero hits, traced to Elasticsearch's query construction. That one became its own fix, written up in [a later post](2026-07-15-elasticsearch-nori-position-hole).
+
+For the broader sequence—from Unicode representation through morphology to phrase-query construction—see the [Korean search correctness guide](../ko/korean-search-correctness).

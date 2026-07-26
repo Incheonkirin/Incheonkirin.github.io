@@ -1,77 +1,87 @@
 ---
-title: "An FDS Dataset Solvable with 48 Transaction Amounts: Auditing 6.38M AI-Hub Rows"
+title: "The fraud dataset whose labels were visible in 48 transaction amounts"
+seoTitle: "AI-Hub FDS dataset audit: 6.38M rows and a 48-value amount shortcut"
 date: 2026-07-15
-description: "Audited 6.38M rows of AI-Hub's synthetic financial fraud data for amount shortcuts, split integrity, and duplicate risk, and assessed whether it can serve as a public FDS benchmark."
+description: "I audited 6.38M AI-Hub FDS rows before model comparison and found that a 48-value transaction-amount template nearly reconstructed the fraud labels."
+tags: [FDS, Dataset-Audit, Fraud-Detection, Model-Evaluation]
+lang: en
+translations:
+  en: posts/2026-07-15-aihub-fds-dataset-validity
+  ko: ko/posts/aihub-fds-dataset-validity
 ---
 
-Before comparing FDS models, I checked whether the data can support the comparison. The target is the public train and validation portion of AI-Hub dataset 71925, "이상 판별을 위한 금융거래 정보 및 사용자 패턴 합성데이터" (synthetic financial transaction and user pattern data for anomaly detection): 6,386,977 rows. It consists of 4,434,106 rows from the 전자금융공동망 segment (Korea's shared interbank electronic banking network) and 1,952,871 card rows, about 90% of the labeled data AI-Hub reports.
+Before training an FDS model, I counted the values in one column.
 
-The short version: the 전자금융공동망 data is hard to use as a benchmark for comparing behavior-based FDS models. The range at or below 1,000,000 won covers 98.97% of the data and contains zero positives, and the amount column across 4.43M rows contains only 48 distinct values. ROC-AUC computed from the amount alone was 0.9969.
-
-This conclusion does not mean the amount is useless for real fraud detection. It means the labels in the public data can mostly be reconstructed from the amount templates of the synthesis process, not from transaction behavior.
-
-## Audit scope
-
-| Dataset | Rows | Positives | Positive rate |
-|---|---:|---:|---:|
-| 전자금융공동망 | 4,434,106 | 17,175 | 0.39% |
-| Card | 1,952,871 | 72,008 | 3.69% |
-
-Instead of reporting a single model score, the audit separated split integrity, single-feature shortcuts, ID memorization, duplicates, temporal shift, and label leakage into distinct checks. Rules and thresholds are fixed in code, and the same protocol also ran on other public FDS datasets.
-
-## Amount template in the 전자금융공동망 data
-
-The first check counted positives per amount bucket. In the snippets below, 거래금액 is the transaction amount and 이상거래여부 is the anomaly label.
+The electronic financial network portion of AI-Hub dataset 71925 contained 4,434,106 audited transactions, but only **48 distinct transaction amounts**. The range at or below KRW 1,000,000 covered 4,388,368 rows—98.97% of the data—and contained **zero positive labels**.
 
 ```python
 low = df[df["거래금액"] <= 1_000_000]
 
 len(low) / len(df)          # 0.9897
 low["이상거래여부"].sum()   # 0
+df["거래금액"].nunique()    # 48
 ```
 
-Transactions at or below 1,000,000 won: 4,388,368 rows, 98.97% of the total. Zero positives in this range. Inspecting the structure of the amount column further, the same pattern repeated.
+An amount-only score reached ROC-AUC `0.9969` on the supplied train/validation split. A behavior model could look excellent on this data without learning account history, transaction sequences, or changing customer behavior. It only had to recover the amount template.
 
-- The 4,434,106 rows use only 48 distinct amount values
-- The top 10 amounts cover 98.05% of all rows
-- 99.91% of amounts are multiples of 1,000 won
-- ROC-AUC using the amount alone: 0.9969
-- Distribution overlap between positive and negative amounts: 0.0065
-- The single value `거래금액=4,000,000` captures 30.05% of all positives, 88.13x the base rate
+That changed the question I was trying to answer. Instead of asking which model won, I first had to ask whether this dataset could distinguish a better fraud model from a better shortcut detector.
 
-This is closer to a codebook than a continuous behavioral feature. A model can score well by reconstructing the amount template, without learning account behavior or transaction sequences.
+## I counted the data before comparing models
 
-## Card data as supporting evidence
+The audit covered the released train and validation files I could configure from AI-Hub's synthetic financial transaction dataset: 6,386,977 rows, about 90% of the labeled rows reported on the dataset page.
 
-The card data also shows the shortcut. The rule `통합승인금액 >= 318,000` (통합승인금액 is the total approved amount), selected on train, scored F1 0.7204 on validation. Certain code values also carried high positive rates.
+| Segment | Audited rows | Positive labels | Positive rate |
+| --- | ---: | ---: | ---: |
+| Electronic financial network | 4,434,106 | 17,175 | 0.39% |
+| Card transactions | 1,952,871 | 72,008 | 3.69% |
 
-| Condition | Positive rate | Share of all positives captured |
-|---|---:|---:|
+I started with checks that do not require a sophisticated model: value counts, positive rates by value and range, class-distribution overlap, duplicates, and the integrity of the supplied split. These reveal whether a benchmark has made its answer available through a low-dimensional rule before model architecture enters the discussion.
+
+The amount column in the electronic financial network segment kept failing those checks:
+
+- the top 10 of its 48 amounts cover 98.05% of all rows
+- 99.91% of rows use amounts divisible by KRW 1,000
+- positive and negative amount distributions have only `0.0065` overlap
+- `거래금액=4,000,000` alone captures 30.05% of all positives at 88.13 times the base positive rate
+
+Individually, round amounts or a strong amount signal can be plausible in financial data. Together with a 98.97% region containing no positives, they form something closer to a label codebook than a continuous behavioral feature.
+
+## A high score was evidence of learnability, not benchmark validity
+
+It would be wrong to conclude that transaction amount is irrelevant to real fraud detection. Amount is often useful. The narrower finding is that, in this released synthetic segment, the label can be reconstructed largely from a small set of amount templates.
+
+That distinction matters because a benchmark score normally stands in for a harder claim: a model that performs better has learned a more useful fraud decision rule. Here, a higher score can instead mean that the model recovered the generator's stable template more efficiently.
+
+The card segment provided supporting evidence, although it was not as decisive as the electronic financial network case. Its amount-only ROC-AUC was `0.9519`, and the ten most common approved amounts covered 86.01% of rows. A threshold selected on train, `통합승인금액 >= 318,000`, reached validation F1 `0.7204`. Individual category values were also unusually revealing:
+
+| Single condition | Positive rate | Share of positives captured |
+| --- | ---: | ---: |
 | `일시불할부구분코드=B` | 97.77% | 33.18% |
-| `승인거래코드=01` | 90.85% | 23.01% |
+| `승인거래코드=1` | 90.85% | 23.01% |
+| `가맹점누적매출금액_구간화=3` | 22.92% | 58.18% |
 
-Here 일시불할부구분코드 is the lump-sum vs. installment code and 승인거래코드 is the approval transaction code.
+The last condition captures more than half of all positive card rows at 6.22 times the base rate. This does not make the card evidence identical to the 48-value amount template, but it reinforces the need for trivial single-feature baselines before interpreting a complex model's score.
 
-The card verdict is weaker than the 전자금융공동망 one. Re-measured against a LightGBM reference model, the card data passed the amount-only PR-AUC and F1 relative-ratio gates. The final verdict rests on split integrity, an amount-only ROC-AUC of 0.9519, and one categorical value that captures 58.18% of positives. That value is separate from the two examples shown above.
+## A stronger baseline invalidated one of my claims
 
-Card is a supporting case showing the shortcut exists. 전자금융공동망 is the core case, meeting seven failure conditions on the amount template alone.
+My first audit harness used a dependency-free Naive Bayes model as its no-ID reference. An amount-only model looked too competitive against it. That supported a convenient claim: a simple amount rule could match a fuller model.
 
-## Baseline sensitivity
+The reference was too weak.
 
-The first audit used dependency-free Naive Bayes as the no-ID reference model. It was too weak to anchor a performance ratio against the amount-only model. Rerunning the sensitivity test with a fixed LightGBM baseline flipped the relative-ratio gate on both datasets from FAIL to PASS.
+I reran the sensitivity analysis with a fixed LightGBM baseline. The relative amount-to-model gates changed from failure to pass on both AI-Hub segments:
 
-| Dataset | LightGBM no-ID PR-AUC | amount-only PR-AUC | Ratio | Relative-ratio gate |
-|---|---:|---:|---:|---|
+| Segment | LightGBM no-ID PR-AUC | Amount-only PR-AUC | Ratio | Relative gate |
+| --- | ---: | ---: | ---: | --- |
 | Card | 0.9935 | 0.6640 | 0.6683 | PASS |
-| 전자금융공동망 | 0.6161 | 0.4600 | 0.7466 | PASS |
+| Electronic financial network | 0.6161 | 0.4600 | 0.7466 | PASS |
 
-So I removed the claim "an amount rule matches a strong model" from the final evidence. The 전자금융공동망 verdict stands on results that do not depend on a reference model: the 48 amount values, the 98.97% zero-positive range, the amount-only ROC-AUC, the distribution overlap, and the single-value shortcut.
+I removed the claim that an amount rule matched a strong model. Keeping it after the stronger baseline contradicted it would have turned an audit into advocacy for a predetermined verdict.
 
-A benchmark audit has to validate the comparison baseline along with the target. A weak baseline can inflate a model's apparent strength, and it can just as easily inflate a data defect.
+The main electronic-network conclusion did not need that comparison. It still rested on model-independent facts: 48 distinct amounts, the 98.97% zero-positive range, amount-only ROC-AUC `0.9969`, distribution overlap `0.0065`, and the single-value shortcut. Auditing the baseline changed the evidence I was willing to use, without changing the findings that survived it.
 
-## Split handling in the distributed validation code
+## The distributed evaluation code erased the supplied split
 
-I also reviewed the source of the official detection model distributed with the data. The card and 전자금융공동망 scripts load the provided train, validation, and test sets, concatenate them into one frame, and re-split with random stratified sampling after preprocessing.
+I also inspected the anomaly-detection source package distributed with the dataset. Both the card and electronic-network scripts load the supplied train, validation, and test files, concatenate them, preprocess the combined frame, and then create a new random stratified split.
 
 ```python
 df = pd.concat([train_df, valid_df, test_df], ignore_index=True)
@@ -85,35 +95,32 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 ```
 
-Categorical factorization also ran on the full data before the new split. Under this structure, temporal shift and generalization to unseen entities cannot be measured. The 전자금융공동망 data additionally contains duplicate feature rows after excluding the label, at 1.365% of the total. Random re-splitting creates paths for the same template or entity to land in both train and test.
+Categorical factorization also runs on the combined data before the new split. Under that evaluation path, the original split boundary no longer measures temporal change or generalization to unseen entities. Repeated templates and entities can appear on both sides of the random split.
 
-## Cross-dataset protocol check
+The electronic-network data also contains 60,538 duplicate feature rows after excluding the label, or 1.365% of the segment. A random re-split makes that duplication more consequential because identical feature templates can land in both training and evaluation data.
 
-The same checks ran on ULB Credit Card Fraud, BAF Base, and my own synthetic dataset. If every dataset fails, the audit rules are too aggressive.
+A published model scoring well under this procedure proves the released rows are learnable. It does not establish that the score represents deployable behavior-level fraud detection.
 
-| Dataset | Verdict | amount-only ROC-AUC | Distinct amounts | Top-10 amount share |
-|---|---|---:|---:|---:|
+## I tested whether the audit itself was too eager to fail data
+
+A protocol that rejects every fraud dataset would not be useful. I therefore ran the same fixed checks on two established public datasets and one synthetic control, rather than choosing thresholds only after seeing the AI-Hub results.
+
+| Dataset | Verdict | Amount-only ROC-AUC | Distinct amounts | Top-10 amount share |
+| --- | --- | ---: | ---: | ---: |
 | K-Claims-Synth v0.2 | PASS | 0.5387 | 99,227 | 0.11% |
 | ULB Credit Card Fraud | WARN | 0.7196 | 32,767 | 16.29% |
 | BAF Base | WARN | 0.5939 | 994,971 | 0.00% |
 | AI-Hub card | FAIL | 0.9519 | 1,931 | 86.01% |
-| AI-Hub 전자금융공동망 | FAIL | 0.9969 | 48 | 98.05% |
+| AI-Hub electronic network | FAIL | 0.9969 | 48 | 98.05% |
 
-The comparison datasets received WARN for single-feature subgroups but did not fail on amount templates, distribution overlap, duplicates, or temporal conditions. This provides evidence that the protocol does not blanket-fail FDS datasets.
+ULB and BAF produced warnings for broad single-feature subgroups, but they did not fail on the concentrated amount-template pattern. The result is graded rather than universal: the protocol can pass, warn, or fail, and the strongest AI-Hub finding remains an outlier under the same rules.
 
-## Gates before model development
+## The useful outcome was a decision about the data
 
-Applied to a real ML workflow, the audit runs in this order.
+The audited electronic financial network release is not suitable for ranking behavior-based FDS models in its current form. Its labels are overwhelmingly recoverable from a 48-value amount template, and the distributed evaluation path removes the supplied split boundary.
 
-1. Fix the split by time and entity first.
-2. Fit preprocessing and aggregation on train, then apply to validation and test.
-3. Keep amount thresholds, single categorical values, and ID-only models as formal baselines.
-4. Check zero-positive ranges, distinct value counts, duplicates, and label conflicts before training.
-5. Sensitivity-test the reference model and the audit thresholds themselves on other datasets.
-6. Once the data passes the gates, select models by AUPRC, Precision@K, and recall at investigation capacity.
+That is not the same as saying the files have no value. They can still support large-scale ingestion tests, schema demonstrations, class-imbalance exercises, and examples of why trivial baselines matter. What they cannot support, without redesigning or removing the shortcut structure, is a claim that a higher F1 or AUC identifies a better model of fraud behavior.
 
-The AI-Hub data remains usable for practicing large-scale loading, schema handling, and imbalanced training. F1 or AUC obtained from the current public structure is not enough to rank behavior-based FDS models.
+There are also limits to the audit. It covers the released train and validation rows I had available, not every labeled row stated on the AI-Hub page. The generator implementation is not public, so the evidence identifies structure in the released data rather than assigning intent or a specific bug inside the generator. The LightGBM run is a frozen sensitivity check, not a tuned model competition.
 
-The audit code, fixed thresholds, LightGBM sensitivity results, and per-dataset JSON and Markdown reports are published at [fraud-dataset-validity](https://github.com/Incheonkirin/fraud-dataset-validity). File hashes and the reviewed lines of the official model source are recorded there as well.
-
-Data: [AI-Hub 71925](https://www.aihub.or.kr/aihubdata/data/view.do?aihubDataSe=data&currMenu=115&dataSetSn=71925&topMenu=100)
+The value of doing this before model development is practical: it prevents weeks of optimization from producing a precise answer to the wrong question. The code, thresholds, source-file hashes, sensitivity runs, and per-dataset reports are published in [fraud-dataset-validity](https://github.com/Incheonkirin/fraud-dataset-validity). The source data is [AI-Hub dataset 71925](https://www.aihub.or.kr/aihubdata/data/view.do?aihubDataSe=data&currMenu=115&dataSetSn=71925&topMenu=100).

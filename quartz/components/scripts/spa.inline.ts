@@ -120,6 +120,11 @@ async function _navigate(url: URL, isBack: boolean = false) {
   const elementsToAdd = html.head.querySelectorAll(":not([data-persist])")
   elementsToAdd.forEach((el) => document.head.appendChild(el))
 
+  // micromorph replaces the body and head, but not the root <html> element.
+  // Keep document-level language metadata in sync when navigating between translations.
+  document.documentElement.lang = html.documentElement.lang
+  document.documentElement.dir = html.documentElement.dir
+
   // delay setting the url until now
   // at this point everything is loaded so changing the url should resolve to the correct addresses
   if (!isBack) {

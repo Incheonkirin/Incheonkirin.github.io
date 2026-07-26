@@ -2,6 +2,10 @@
 title: "Zero Hits for the Exact Source Text: Position Holes in Elasticsearch nori"
 date: 2026-07-15
 description: "Why exact phrase search failed when position holes disappeared from the token graph built by nori mixed decompounding and the part-of-speech filter, and how the fix landed in Elasticsearch."
+lang: en
+translations:
+  en: posts/2026-07-15-elasticsearch-nori-position-hole
+  ko: ko/posts/elasticsearch-nori-position-hole
 ---
 
 A document contained the exact string `보험계약대출이율` (insurance policy loan interest rate). `match` found the document, and `match_phrase` found it at `slop=1`. The same string in `match_phrase` with `slop=0` returned 0 hits.
@@ -107,3 +111,5 @@ source text
 ```
 
 An analyzer producing correct tokens does not by itself preserve search semantics. Position relationships can change at the query construction stage, before ranking is involved.
+
+Related failures at earlier boundaries: [NFD Hangul misses nori's dictionary](2026-06-30-nfd-hangul-and-noris-dictionary), and [the default XPN stoptag collapses 비급여 into 급여](2026-06-16-noris-default-stoptags-drop-korean-negation-prefixes). The [Korean search correctness guide](../ko/korean-search-correctness) connects all three.

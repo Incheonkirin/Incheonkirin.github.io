@@ -25,6 +25,7 @@ export const defaultContentPageLayout: PageLayout = {
       component: Component.ContentMeta(),
       condition: (page) => page.fileData.slug !== "index" && page.fileData.slug !== "about",
     }),
+    Component.LanguageSwitcher(),
   ],
   left: [Component.PageTitle(), Component.SiteNav()],
   right: [

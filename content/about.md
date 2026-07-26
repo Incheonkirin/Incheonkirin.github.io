@@ -1,5 +1,6 @@
 ---
 title: Profile
+seoTitle: "Mingi Jeong — Search & Applied ML Engineering Profile"
 description: Korean search and ML systems engineer. 5.5 years of Korean search and question answering, production ML at MetLife, 18 external patches merged into Lucene, Elasticsearch, sentence-transformers, Transformers, MLflow, and LlamaIndex.
 ---
 
@@ -20,6 +21,8 @@ Failure cases collected from the question-answering system fed into national dat
 ## Public engineering
 
 I turn problems found in insurance policy documents and Korean-language queries into reproducible tests and upstream fixes. 18 external patches have been merged into Lucene, Elasticsearch, sentence-transformers, Transformers, MLflow, and LlamaIndex.
+
+The Unicode, morphology, token-graph, and wildcard failures are connected in an [Elasticsearch·Lucene Korean search correctness guide](ko/korean-search-correctness).
 
 - [sentence-transformers #3827](https://github.com/huggingface/sentence-transformers/pull/3827): excluded padding from the Plackett-Luce normalizer in ListMLE losses. The maintainer's NanoBEIR benchmark measured mean nDCG@10 of 0.529 for the fixed ListMLE (against a ~0.39 baseline from older library versions) and 0.525 vs 0.514 in the controlled PListMLE comparison. [Post](posts/2026-06-20-padding-in-the-plackett-luce-normalizer-listmle)
 - [Apache Lucene #16242](https://github.com/apache/lucene/pull/16242): added `HangulCompositionCharFilter` to analysis-nori so NFD-decomposed Hangul analyzes like NFC text. [Post](posts/2026-06-30-nfd-hangul-and-noris-dictionary)

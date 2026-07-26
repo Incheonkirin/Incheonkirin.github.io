@@ -1,10 +1,11 @@
 ---
 title: Mingi Jeong
+seoTitle: "Mingi Jeong — Lucene, Elasticsearch & Applied ML Engineer"
 description: "Failures in Korean search, ranking, and ML systems traced to reproducible tests, then to an upstream fix or a measured decision."
 ---
 
 <section class="intro">
-  <p class="lede">I trace failures in Korean search, ranking, and ML systems to reproducible tests — then to an upstream fix or a measured decision.</p>
+  <h1 class="lede">I trace failures in Korean search, ranking, and ML systems to reproducible tests — then to an upstream fix or a measured decision.</h1>
   <p class="creds">5.5 years in Korean search and question answering at 42Maru · production ML at MetLife · 18 patches merged into Lucene, Elasticsearch, sentence-transformers, and Transformers.</p>
 </section>
 
@@ -15,8 +16,8 @@ description: "Failures in Korean search, ranking, and ML systems traced to repro
   </div>
 
   <article class="lead-entry">
-    <h3 class="lead-title"><a class="internal" href="posts/2026-06-30-nfd-hangul-and-noris-dictionary">Two Korean strings look identical but don't match</a></h3>
-    <p class="lead-body">Korean text typed on a Mac can look the same on screen yet be stored as different bytes (NFD form). The search engine's dictionary only knew the other form, so that text was quietly dropped and never matched. I added a filter that composes the characters into the dictionary's form before indexing — no extra dependency, and search highlighting still lines up.</p>
+    <h3 class="lead-title"><a class="internal" href="posts/2026-06-30-nfd-hangul-and-noris-dictionary">Identical Korean text produced different search results</a></h3>
+    <p class="lead-body">A Korean word stored as decomposed Unicode looked normal on screen but bypassed Nori's dictionary and became one unknown token. I traced the silent mismatch to the analyzer boundary, then added a Hangul composition filter that restores the dictionary lookup without adding ICU and preserves offsets for highlighting.</p>
     <p class="lead-result">Merged into Apache Lucene <span class="dim">· reviewed and approved by a core maintainer (Robert Muir) · #16242</span></p>
   </article>
 
@@ -48,7 +49,7 @@ description: "Failures in Korean search, ranking, and ML systems traced to repro
   <article class="lead-entry">
     <h3 class="lead-title"><a class="internal" href="posts/2026-06-20-padding-in-the-plackett-luce-normalizer-listmle">A ranking model trained differently depending on the batch</a></h3>
     <p class="lead-body">To train a ranking model quickly, many search queries are scored together in one batch — but each query has a different number of documents, so the shorter lists are filled with empty placeholder slots to make them the same length. Those empty slots were being counted as if they were real documents, so the same query trained differently depending on which other queries happened to share its batch. I excluded the padding from the calculation so the result no longer depends on batch composition.</p>
-    <p class="lead-result">Merged into sentence-transformers <span class="dim">· maintainer's benchmark: NanoBEIR nDCG@10 0.39 → 0.53 · #3827</span></p>
+    <p class="lead-result">Merged into sentence-transformers <span class="dim">· controlled maintainer benchmark: PListMLE nDCG@10 0.514 → 0.525 · #3827</span></p>
   </article>
 
   <div class="entries">
@@ -67,9 +68,9 @@ description: "Failures in Korean search, ranking, and ML systems traced to repro
   </div>
 
   <article class="lead-entry">
-    <h3 class="lead-title"><a class="internal" href="posts/2026-07-15-aihub-fds-dataset-validity">A fraud dataset that 48 numbers could solve</a></h3>
-    <p class="lead-body">A public AI-Hub dataset is used as training data for financial fraud detection. Auditing 6.38 million records, I found that 4.43M interbank-network rows held only 48 distinct transaction amounts, and the amount bracket covering 98.97% of the data contained no fraud at all — so a model can score well on it without learning anything about fraud. The audit is published with reproducible code.</p>
-    <p class="lead-result">Published as a reproducible audit <span class="dim">· 6.38M records checked before any model comparison · code public</span></p>
+    <h3 class="lead-title"><a class="internal" href="posts/2026-07-15-aihub-fds-dataset-validity">The fraud labels were visible in 48 transaction amounts</a></h3>
+    <p class="lead-body">Before comparing FDS models, I audited 6.38 million AI-Hub rows. The 4.43M-row electronic-network segment used only 48 transaction amounts, and the range covering 98.97% of its rows contained no positives. A high score could therefore reward recovery of the synthesis template rather than behavior-level fraud detection.</p>
+    <p class="lead-result">Published as a reproducible audit <span class="dim">· benchmark rejected for behavior-model comparison · code and evidence public</span></p>
   </article>
 
   <div class="entries">

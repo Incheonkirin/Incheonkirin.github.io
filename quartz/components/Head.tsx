@@ -14,7 +14,9 @@ export default (() => {
   }: QuartzComponentProps) => {
     const titleSuffix = cfg.pageTitleSuffix ?? ""
     const title =
-      (fileData.frontmatter?.title ?? i18n(cfg.locale).propertyDefaults.title) + titleSuffix
+      (fileData.frontmatter?.seoTitle ??
+        fileData.frontmatter?.title ??
+        i18n(cfg.locale).propertyDefaults.title) + titleSuffix
     const description =
       fileData.frontmatter?.socialDescription ??
       fileData.frontmatter?.description ??
@@ -66,6 +68,9 @@ export default (() => {
       fileData.slug === "404" || fileData.slug === "index"
         ? url.toString()
         : joinSegments(url.toString(), fileData.slug!)
+    const translations = fileData.frontmatter?.translations as Record<string, string> | undefined
+    const translationEntries = Object.entries(translations ?? {})
+    const defaultTranslation = translations?.en
 
     const usesCustomOgImage = ctx.cfg.plugins.emitters.some(
       (e) => e.name === CustomOgImagesEmitterName,
@@ -134,6 +139,16 @@ export default (() => {
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
         <link rel="canonical" href={canonicalUrl} />
+        {translationEntries.map(([lang, slug]) => (
+          <link rel="alternate" hrefLang={lang} href={joinSegments(url.toString(), slug)} />
+        ))}
+        {defaultTranslation && (
+          <link
+            rel="alternate"
+            hrefLang="x-default"
+            href={joinSegments(url.toString(), defaultTranslation)}
+          />
+        )}
 
         {css.map((resource) => CSSResourceToStyleElement(resource, true))}
         {js
