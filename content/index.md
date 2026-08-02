@@ -6,7 +6,7 @@ description: "Failures in Korean search, ranking, and ML systems traced to repro
 
 <section class="intro">
   <h1 class="lede">I trace failures in Korean search, ranking, and ML systems to reproducible tests — then to an upstream fix or a measured decision.</h1>
-  <p class="creds">5.5 years in Korean search and question answering at 42Maru · production ML at MetLife · 18 patches merged into Lucene, Elasticsearch, sentence-transformers, and Transformers.</p>
+  <p class="creds">5.5 years in Korean search and question answering at 42Maru · production ML in global financial services · 18 patches merged into Lucene, Elasticsearch, sentence-transformers, and Transformers.</p>
 </section>
 
 <section class="section">

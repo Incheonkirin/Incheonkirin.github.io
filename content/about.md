@@ -1,12 +1,12 @@
 ---
 title: Profile
 seoTitle: "Mingi Jeong — Search & Applied ML Engineering Profile"
-description: Korean search and ML systems engineer. 5.5 years of Korean search and question answering, production ML at MetLife, 18 external patches merged into Lucene, Elasticsearch, sentence-transformers, Transformers, MLflow, and LlamaIndex.
+description: Korean search and ML systems engineer. 5.5 years of Korean search and question answering, production ML in global financial services, 18 external patches merged into Lucene, Elasticsearch, sentence-transformers, Transformers, MLflow, and LlamaIndex.
 ---
 
-I am a Korean search and ML systems engineer. I spent five and a half years at 42Maru building Korean search and question-answering systems, and I now develop ML models for the insurance business at MetLife and own their operation, monitoring, and iteration after deployment.
+I am a Korean search and ML systems engineer. I spent five and a half years at 42Maru building Korean search and question-answering systems, and I now build and operate production ML systems for insurance at a global financial services company, owning their monitoring and iteration after deployment.
 
-## MetLife · Data Scientist · 2024–present
+## Global Financial Services · Data Scientist · 2024–present
 
 I build and operate models for customer retention, sales activity, and risk review, tracking operational metrics and data drift in production and reworking the recurring operations around them.
 
